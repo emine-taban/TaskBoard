@@ -6,7 +6,7 @@ namespace TaskBoard
     /// <summary>
     /// Kanban panolarındaki her bir görev kartını temsil eden UserControl.
     /// </summary>
-    public class TaskCardControl : Panel
+    public partial class TaskCardControl : Panel
     {
         [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
         public int TaskId { get; }

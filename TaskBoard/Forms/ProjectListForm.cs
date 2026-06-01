@@ -102,10 +102,28 @@ namespace TaskBoard
 
             card.Controls.AddRange(new Control[] { topStrip, lblName, lblDesc, lblDate });
 
+            // --- YENİ EKLENEN SAĞ TIK -> SİL MENÜSÜ ---
+            if (Session.IsAdmin)
+            {
+                var ctxMenu = new ContextMenuStrip();
+                var deleteItem = new ToolStripMenuItem("Projeyi Sil", null, (s, e) => DeleteProject(project));
+                deleteItem.ForeColor = Color.Red; // Silme işlemi olduğu için kırmızı yaptık
+                ctxMenu.Items.Add(deleteItem);
+
+                // Menüyü hem karta hem de içindeki yazılara tanımlıyoruz ki nereye sağ tıklarsa tıklasın açılsın
+                card.ContextMenuStrip = ctxMenu;
+                foreach (Control ctrl in card.Controls)
+                {
+                    ctrl.ContextMenuStrip = ctxMenu;
+                }
+            }
+            // -------------------------------------------
+
             // Hover efekti
             card.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(40, 40, 62);
             card.MouseLeave += (s, e) => card.BackColor = Color.FromArgb(30, 30, 48);
             card.Click += ProjectCard_Click;
+
             foreach (Control ctrl in card.Controls)
             {
                 ctrl.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(40, 40, 62);
@@ -115,6 +133,30 @@ namespace TaskBoard
 
             return card;
         }
+
+        // --- YENİ EKLENEN SİLME METODU ---
+        private void DeleteProject(Project project)
+        {
+            var result = MessageBox.Show(
+                $"'{project.Name}' adlı projeyi kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz!",
+                "Projeyi Sil",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (result == DialogResult.Yes)
+            {
+                using var db = new AppDbContext();
+                var prjToDelete = db.Projects.Find(project.Id);
+
+                if (prjToDelete != null)
+                {
+                    db.Projects.Remove(prjToDelete);
+                    db.SaveChanges();
+                    LoadProjects(); // Paneli yenile ve projeyi ekrandan anında kaldır
+                }
+            }
+        }
+        // ---------------------------------
 
         private void ProjectCard_Click(object? sender, EventArgs e)
         {

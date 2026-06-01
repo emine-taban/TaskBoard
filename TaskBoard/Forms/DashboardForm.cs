@@ -4,14 +4,21 @@ using TaskBoard.Data.Models;
 
 namespace TaskBoard
 {
-    public class DashboardForm : Form
+    
+    public partial class DashboardForm : Form
     {
-        private readonly Project _project;
+        private  Project _project;
+
+     
 
         public DashboardForm(Project project)
         {
             _project = project;
             BuildUI();
+        }
+
+        public DashboardForm()
+        {
         }
 
         private void BuildUI()
@@ -34,12 +41,12 @@ namespace TaskBoard
                 .ToList();
 
             var allTasks = columns.SelectMany(c => c.Tasks).ToList();
-            int total    = allTasks.Count;
-            int done     = columns
+            int total = allTasks.Count;
+            int done = columns
                 .Where(c => c.Name.Contains("Bitti", StringComparison.OrdinalIgnoreCase))
                 .SelectMany(c => c.Tasks).Count();
-            int overdue  = allTasks.Count(t => t.DueDate.HasValue && t.DueDate.Value.Date < DateTime.Today);
-            int inProg   = total - done;
+            int overdue = allTasks.Count(t => t.DueDate.HasValue && t.DueDate.Value.Date < DateTime.Today);
+            int inProg = total - done;
 
             // ─── Header ──────────────────────────────────────────────
             var pnlHeader = new Panel
